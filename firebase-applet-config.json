@@ -1,7 +1,7 @@
 {
   "projectId": "aqua-breeding-platform-prod",
   "appId": "1:679862639469:web:dbdd23a3ce8a9bf8ebd864",
-  "storageBucket": "aqua-breeding-platform-prod.firebasestorage.app",
+  "storageBucket": "aqua-breeding-prod-uploads",
   "apiKey": "AIzaSyAN8Py3vjPlCGVxJMv-KnCbNeLEE0cSF2c",
   "authDomain": "aqua-breeding-platform-prod.firebaseapp.com",
   "messagingSenderId": "679862639469",
