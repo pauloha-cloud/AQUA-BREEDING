@@ -8,8 +8,9 @@ class JobMessage:
     tenant_id: str
     org_id: str
     input_bucket: str
-    phenotype_object: str
-    pedigree_object: str
+    genetic_data_object: Optional[str] = None
+    phenotype_object: Optional[str] = None
+    pedigree_object: Optional[str] = None
     output_bucket: str
     output_prefix: str
     requested_by: str

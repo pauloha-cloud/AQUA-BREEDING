@@ -11,6 +11,7 @@ from app.services.vertex.ai_service import VertexAIInsightService
 from app.infrastructure.gcs_service import GCSService
 from app.config import settings
 from app.infrastructure.monitoring import telemetry
+from app.data_prep import prepare_genetic_input
 
 logger = logging.getLogger(__name__)
 
@@ -33,16 +34,27 @@ class JobProcessor:
                 tmp_path = Path(tmp_dir)
                 
                 # 1. Download Inputs from GCS
-                pheno_local = self.gcs.download_file(
-                    job.input_bucket, 
-                    job.phenotype_object, 
-                    str(tmp_path / "phenotype.csv")
-                )
-                ped_local = self.gcs.download_file(
-                    job.input_bucket, 
-                    job.pedigree_object, 
-                    str(tmp_path / "pedigree.csv")
-                )
+                if job.genetic_data_object:
+                    telemetry.log_structured("INFO", "Processing single genetic data file", {"job_id": job.job_id})
+                    genetic_file_ext = os.path.splitext(job.genetic_data_object)[1] or '.csv'
+                    genetic_local = self.gcs.download_file(
+                        job.input_bucket,
+                        job.genetic_data_object,
+                        str(tmp_path / f"genetic_data{genetic_file_ext}")
+                    )
+                    pheno_local, ped_local = prepare_genetic_input(genetic_local, str(tmp_path))
+                else:
+                    telemetry.log_structured("INFO", "Processing separate phenotype/pedigree files", {"job_id": job.job_id})
+                    pheno_local = self.gcs.download_file(
+                        job.input_bucket, 
+                        job.phenotype_object, 
+                        str(tmp_path / "phenotype.csv")
+                    )
+                    ped_local = self.gcs.download_file(
+                        job.input_bucket, 
+                        job.pedigree_object, 
+                        str(tmp_path / "pedigree.csv")
+                    )
                 
                 # 2. Execute R Script
                 r_start = time.time()

@@ -82,6 +82,8 @@ export default function App() {
 
   const [jobs, setJobs] = useState<any[]>([]);
   const [jobDescription, setJobDescription] = useState('');
+  const [geneticFile, setGeneticFile] = useState<File | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const t = translations[language];
 
@@ -222,19 +224,23 @@ export default function App() {
 
   const handleNewJob = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !geneticFile) return;
     
     setIsUploading(true);
+    setValidationError(null);
     try {
-      const { createJob } = await import('./services/jobService');
-      await createJob(user.uid, jobDescription);
+      const { uploadGeneticDataAndCreateJob } = await import('./services/jobService');
+      await uploadGeneticDataAndCreateJob(geneticFile, jobDescription, user.uid);
+      
       setIsUploading(false);
       setIsModalOpen(false);
       setJobDescription('');
+      setGeneticFile(null);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 5000);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Job creation failed", error);
+      setValidationError(error.message || "Failed to upload and start pipeline");
       setIsUploading(false);
     }
   };
@@ -695,21 +701,32 @@ export default function App() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
                   <div>
-                    <label className="text-[10px] uppercase font-black text-aqua-muted tracking-[0.2em] mb-3 block italic">Biological_Data.csv</label>
-                    <div className="border-2 border-dashed border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center bg-white/5 hover:border-aqua-primary/50 cursor-pointer transition-all group">
-                      <FilePlus size={24} className="text-aqua-muted group-hover:text-aqua-primary mb-2" />
-                      <span className="text-[9px] font-black uppercase text-aqua-muted group-hover:text-white tracking-widest">Upload Genetic Data</span>
-                    </div>
+                    <label className="text-[10px] uppercase font-black text-aqua-muted tracking-[0.2em] mb-3 block italic">Genetic_Dataset (.xlsx, .csv)</label>
+                    <label className="border-2 border-dashed border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center bg-white/5 hover:border-aqua-primary/50 cursor-pointer transition-all group relative">
+                      <input 
+                         type="file" 
+                         accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" 
+                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                         onChange={(e) => {
+                           if (e.target.files && e.target.files.length > 0) {
+                             setGeneticFile(e.target.files[0]);
+                             setValidationError(null);
+                           }
+                         }}
+                      />
+                      <FilePlus size={24} className={cn("mb-2 transition-colors", geneticFile ? "text-aqua-accent" : "text-aqua-muted group-hover:text-aqua-primary")} />
+                      <span className={cn("text-[10px] font-black uppercase tracking-widest break-all max-w-[80%] text-center", geneticFile ? "text-white" : "text-aqua-muted group-hover:text-white")}>
+                        {geneticFile ? geneticFile.name : "Upload Genetic Data"}
+                      </span>
+                    </label>
                   </div>
-                  <div>
-                    <label className="text-[10px] uppercase font-black text-aqua-muted tracking-[0.2em] mb-3 block italic">Pedigree_Source.csv</label>
-                    <div className="border-2 border-dashed border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center bg-white/5 hover:border-aqua-primary/50 cursor-pointer transition-all group">
-                      <FilePlus size={24} className="text-aqua-muted group-hover:text-aqua-primary mb-2" />
-                      <span className="text-[9px] font-black uppercase text-aqua-muted group-hover:text-white tracking-widest">Upload Ancestry</span>
+                  {validationError && (
+                    <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-4 rounded-xl text-[10px] uppercase font-black tracking-widest leading-relaxed">
+                      {validationError}
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-4 pt-4">
@@ -722,8 +739,8 @@ export default function App() {
                   </button>
                   <button 
                     type="submit"
-                    disabled={isUploading}
-                    className="flex-1 py-4 aqua-gradient text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl shadow-aqua-primary/20 hover:scale-[1.02] active:scale-100 transition-all flex items-center justify-center gap-2 neon-glow"
+                    disabled={!jobDescription || !geneticFile || isUploading}
+                    className="flex-1 py-4 aqua-gradient text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl shadow-aqua-primary/20 hover:scale-[1.02] active:scale-100 disabled:opacity-50 disabled:hover:scale-100 transition-all flex items-center justify-center gap-2 neon-glow"
                   >
                     {isUploading ? (
                       <>Processing... <div className="w-3 h-3 border-2 border-white/50 border-t-white rounded-full animate-spin" /></>

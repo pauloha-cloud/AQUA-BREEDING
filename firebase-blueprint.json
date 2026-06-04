@@ -23,6 +23,7 @@
         "userId": { "type": "string" },
         "status": { "type": "string", "enum": ["pending", "processing", "completed", "failed"] },
         "description": { "type": "string" },
+        "filePath": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },

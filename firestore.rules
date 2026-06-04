@@ -44,7 +44,7 @@ service cloud.firestore {
 
     function isValidJob(data) {
       return data.keys().hasAll(['jobId', 'userId', 'status', 'description', 'createdAt', 'updatedAt']) &&
-             data.keys().size() == 6 &&
+             (data.keys().size() == 6 || (data.keys().size() == 7 && data.keys().hasAll(['filePath']) && data.filePath is string && data.filePath.size() <= 1024)) &&
              data.jobId is string && data.jobId.size() <= 64 &&
              data.userId is string && data.userId.size() <= 128 &&
              data.status in ['pending', 'processing', 'completed', 'failed'] &&
