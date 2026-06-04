@@ -1,10 +1,10 @@
 {
-  "projectId": "modelo-animal-mvp-489520",
-  "appId": "1:668575929018:web:48b5e5a1bba59819eda883",
-  "apiKey": "AIzaSyD_qxgZXtSa07JywJWdhgVawkzQs4_PEYs",
-  "authDomain": "modelo-animal-mvp-489520.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-600ac9dc-f678-436d-b857-df225f1916aa",
-  "storageBucket": "modelo-animal-storage",
-  "messagingSenderId": "668575929018",
-  "measurementId": ""
+  "projectId": "aqua-breeding-platform-prod",
+  "appId": "1:679862639469:web:dbdd23a3ce8a9bf8ebd864",
+  "storageBucket": "aqua-breeding-platform-prod.firebasestorage.app",
+  "apiKey": "AIzaSyAN8Py3vjPlCGVxJMv-KnCbNeLEE0cSF2c",
+  "authDomain": "aqua-breeding-platform-prod.firebaseapp.com",
+  "messagingSenderId": "679862639469",
+  "projectNumber": "679862639469",
+  "version": "2"
 }
